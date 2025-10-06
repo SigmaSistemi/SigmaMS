@@ -1,0 +1,185 @@
+﻿<Window
+    x:Class="SigmaMS.ScriptWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
+    Title="Script Window"
+    Width="800"
+    Height="600"
+    WindowStartupLocation="CenterOwner">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!--  Header  -->
+        <Border
+            Grid.Row="0"
+            Padding="10"
+            Background="#f0f0f0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!--  Prima riga - Titolo e pulsanti principali  -->
+                <Grid Name="HeaderGrid" Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+        x:Name="txtObjectName"
+        Grid.Column="0"
+        VerticalAlignment="Center"
+        FontSize="14"
+        FontWeight="Bold" />
+
+                    <Button
+        x:Name="btnTest"
+        Grid.Column="1"
+        Width="100"
+        Height="30"
+        Margin="0,0,8,0"
+        Click="BtnTest_Click"
+        Content="🧪 Test SP"
+        FontWeight="Bold"
+        ToolTip="Genera script di test per la stored procedure"
+        Visibility="Collapsed" />
+
+                    <Button
+        x:Name="btnExecute"
+        Grid.Column="2"
+        Width="100"
+        Height="30"
+        Margin="0,0,8,0"
+        Click="BtnExecute_Click"
+        Content="▶️ Esegui"
+        FontWeight="Bold"
+        ToolTip="Esegui query SQL (F5)" />
+
+                    <Button
+        x:Name="btnCopy"
+        Grid.Column="3"
+        Width="90"
+        Height="30"
+        Margin="0,0,8,0"
+        Click="BtnCopy_Click"
+        Content="📋 Copia"
+        ToolTip="Copia testo selezionato o tutto (Ctrl+C)" />
+
+                    <Button
+        x:Name="btnSave"
+        Grid.Column="4"
+        Width="90"
+        Height="30"
+        Click="BtnSave_Click"
+        Content="💾 Salva"
+        ToolTip="Salva script su file (Ctrl+S)" />
+                </Grid>
+
+                <!--  Seconda riga - Opzioni e info  -->
+                <StackPanel
+                    Grid.Row="1"
+                    Margin="0,8,0,0"
+                    Orientation="Horizontal">
+                    <CheckBox
+                        x:Name="chkWordWrap"
+                        Margin="0,0,20,0"
+                        Checked="ChkWordWrap_Changed"
+                        Content="Word Wrap"
+                        Unchecked="ChkWordWrap_Changed" />
+
+                    <CheckBox
+                        x:Name="chkReuseResultsWindow"
+                        Margin="0,0,20,0"
+                        Checked="ChkReuseResultsWindow_Changed"
+                        Content="Riutilizza finestra risultati"
+                        IsChecked="True"
+                        ToolTip="Se attivo, i risultati verranno mostrati sempre nella stessa finestra&#x0a;Se disattivo, ogni esecuzione aprirà una nuova finestra&#x0a;Scorciatoia: Ctrl+F5"
+                        Unchecked="ChkReuseResultsWindow_Changed" />
+
+                    <TextBlock
+                        x:Name="txtLineCount"
+                        VerticalAlignment="Center"
+                        Foreground="Gray" />
+
+                    <TextBlock
+                        x:Name="txtResultsMode"
+                        Margin="20,0,0,0"
+                        VerticalAlignment="Center"
+                        FontSize="10"
+                        Foreground="DarkBlue"
+                        Text="Modalità: Riutilizza finestra" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!--  Barra di Editing  -->
+        <Border
+            Grid.Row="1"
+            Padding="8,4"
+            Background="#f8f8f8"
+            BorderBrush="#e0e0e0"
+            BorderThickness="0,1,0,1">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Foreground="#666"
+                    FontSize="11"
+                    FontWeight="SemiBold"
+                    Text="Editor:"
+                    Margin="0,0,8,0" />
+
+                <Button
+                    x:Name="btnComment"
+                    Width="100"
+                    Height="24"
+                    Margin="0,0,6,0"
+                    Click="BtnComment_Click"
+                    Content="💬 Commenta"
+                    FontSize="10"
+                    FontWeight="SemiBold"
+                    ToolTip="Commenta/Decommenta righe selezionate (Ctrl+/)" />
+
+                <Button
+                    x:Name="btnFormat"
+                    Width="90"
+                    Height="24"
+                    Margin="0,0,6,0"
+                    Click="BtnFormat_Click"
+                    Content="🎨 Formatta"
+                    FontSize="10"
+                    FontWeight="SemiBold"
+                    ToolTip="Formatta codice SQL (Ctrl+Shift+F)" />
+            </StackPanel>
+        </Border>
+
+        <!--  Editor  -->
+        <avalonedit:TextEditor
+            x:Name="txtScript"
+            Grid.Row="2"
+            Background="White"
+            FontFamily="Consolas"
+            FontSize="12"
+            Foreground="Black"
+            HorizontalScrollBarVisibility="Auto"
+            IsReadOnly="False"
+            LineNumbersForeground="Gray"
+            ShowLineNumbers="True"
+            SyntaxHighlighting="SQL"
+            TextChanged="TxtScript_TextChanged"
+            VerticalScrollBarVisibility="Auto" />
+
+
+    </Grid>
+</Window>

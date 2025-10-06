@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net9.0-windows</TargetFramework>
+		<UseWPF>true</UseWPF>
+		<UseWindowsForms>false</UseWindowsForms>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<ApplicationIcon>azure_kusto.ico</ApplicationIcon>
+		<PackageIcon></PackageIcon>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Remove="azure_kusto.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="azure_kusto.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="AvalonEdit" Version="6.3.1.120" />
+		<PackageReference Include="DevExpress.Wpf" Version="24.2.7" />
+		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="PoorMansTSqlFormatterRedux" Version="1.0.3" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="azure_kusto.png" />
+	</ItemGroup>
+
+</Project>

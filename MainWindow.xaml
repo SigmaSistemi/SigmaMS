@@ -1,0 +1,443 @@
+﻿<Window
+    x:Class="SigmaMS.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="SQL Server Manager"
+    Width="1200"
+    Height="800"
+    Background="{StaticResource BackgroundBrush}"
+    Icon="/azure_kusto.png"
+    WindowStartupLocation="CenterScreen">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!--  Menu  -->
+        <Menu Grid.Row="0">
+            <MenuItem Header="_Connessioni">
+                <MenuItem Click="NewConnection_Click" Header="Nuova Connessione">
+                    <MenuItem.Icon>
+                        <TextBlock FontSize="14" Text="➕" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Click="EditConnection_Click" Header="Modifica Connessione">
+                    <MenuItem.Icon>
+                        <TextBlock FontSize="14" Text="✏️" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Click="DeleteConnection_Click" Header="Elimina Connessione">
+                    <MenuItem.Icon>
+                        <TextBlock FontSize="14" Text="🗑️" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator />
+                <MenuItem Click="Exit_Click" Header="Esci">
+                    <MenuItem.Icon>
+                        <TextBlock FontSize="14" Text="🚪" />
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Strumenti">
+                <MenuItem Click="ExportConfig_Click" Header="Esporta Configurazione">
+                    <MenuItem.Icon>
+                        <TextBlock FontSize="14" Text="💾" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Click="ImportConfig_Click" Header="Importa Configurazione">
+                    <MenuItem.Icon>
+                        <TextBlock FontSize="14" Text="📁" />
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+
+        <!--  Contenuto principale  -->
+        <Grid Grid.Row="1" Margin="8">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!--  Sezione Connessione e Database  -->
+            <Border
+                Grid.Row="0"
+                Margin="0,0,0,8"
+                Padding="8"
+                Background="{StaticResource SurfaceBrush}"
+                BorderBrush="{StaticResource BorderBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        Content="🔗 Connessione:"
+                        Style="{StaticResource HeaderLabel}" />
+                    <ComboBox
+                        Name="cmbConnections"
+                        Grid.Column="1"
+                        Height="28"
+                        Margin="8,0,16,0"
+                        Padding="4,4,4,0"
+                        DisplayMemberPath="Name"
+                        SelectedValuePath="ConnectionString"
+                        SelectionChanged="CmbConnections_SelectionChanged" />
+
+                    <Label
+                        Grid.Column="2"
+                        VerticalAlignment="Center"
+                        Content="🗄️ Database:"
+                        Style="{StaticResource HeaderLabel}" />
+                    <ComboBox
+                        Name="cmbDatabases"
+                        Grid.Column="3"
+                        Height="28"
+                        Margin="8,0,16,0"
+                        Padding="4,4,4,0"
+                        SelectionChanged="CmbDatabases_SelectionChanged" />
+
+                    <Button
+                        Name="btnRefresh"
+                        Grid.Column="4"
+                        Width="100"
+                        Height="35"
+                        Click="Refresh_Click"
+                        Content="🔄 Aggiorna" />
+                </Grid>
+            </Border>
+
+            <!--  Sezione Filtri  -->
+            <Border
+                Grid.Row="1"
+                Margin="0,0,0,8"
+                Padding="8"
+                Background="{StaticResource SurfaceBrush}"
+                BorderBrush="{StaticResource AccentBrush}"
+                BorderThickness="1,1,1,1"
+                CornerRadius="8">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Label
+                        Grid.Row="0"
+                        Margin="0,0,0,12"
+                        Content="🔍 Filtri di Ricerca"
+                        FontSize="16"
+                        Style="{StaticResource HeaderLabel}" />
+
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Label
+                            Grid.Column="0"
+                            VerticalAlignment="Center"
+                            Content="Filtro 1:" />
+                        <TextBox
+                            Name="txtFilter1"
+                            Grid.Column="1"
+                            Margin="8,0,16,0"
+                            Padding="10,8"
+                            TextChanged="Filter_TextChanged"
+                            ToolTip="Es: Giant3% - Filtra oggetti che iniziano con 'Giant3'" />
+
+                        <Label
+                            Grid.Column="2"
+                            VerticalAlignment="Center"
+                            Content="Filtro 2:" />
+                        <TextBox
+                            Name="txtFilter2"
+                            Grid.Column="3"
+                            Margin="8,0,16,0"
+                            Padding="10,8"
+                            TextChanged="Filter_TextChanged"
+                            ToolTip="Es: PO_caricoImpianti - Filtra ulteriormente i risultati" />
+
+                        <Label
+                            Grid.Column="4"
+                            VerticalAlignment="Center"
+                            Content="Filtro 3:" />
+                        <TextBox
+                            Name="txtFilter3"
+                            Grid.Column="5"
+                            Margin="8,0,16,0"
+                            Padding="10,8"
+                            TextChanged="Filter_TextChanged"
+                            ToolTip="Filtro finale per affinare la ricerca" />
+
+                        <Button
+                            Name="btnClearFilters"
+                            Grid.Column="6"
+                            Width="100"
+                            Height="35"
+                            Click="ClearFilters_Click"
+                            Content="🗑️ Pulisci"
+                            Style="{StaticResource SecondaryButton}" />
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!--  Sezione Tipi di Oggetti - Collassabile  -->
+            <Expander
+                Grid.Row="2"
+                Margin="0,0,0,16"
+                Background="{StaticResource SurfaceBrush}"
+                BorderBrush="{StaticResource BorderBrush}"
+                BorderThickness="1"
+                Header="📊 Tipi di Oggetti"
+                IsExpanded="False">
+                <Border Padding="12">
+                    <TreeView
+                        Name="tvObjectTypes"
+                        MaxHeight="180"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        SelectedItemChanged="TvObjectTypes_SelectedItemChanged" />
+                </Border>
+            </Expander>
+
+            <!--  Lista oggetti  -->
+            <Border
+                Grid.Row="3"
+                Margin="0,0,0,16"
+                Background="{StaticResource SurfaceBrush}"
+                BorderBrush="{StaticResource BorderBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!--  Header lista  -->
+                    <Border
+                        Grid.Row="0"
+                        Padding="16,12"
+                        CornerRadius="8,8,0,0">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                <GradientStop Offset="0" Color="#1B365D" />
+                                <GradientStop Offset="1" Color="#2E5984" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Grid.Column="0"
+                                FontSize="16"
+                                FontWeight="SemiBold"
+                                Foreground="White"
+                                Text="📋 Oggetti Database" />
+                            <TextBlock
+                                Name="txtObjectCount"
+                                Grid.Column="1"
+                                Margin="16,0"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                FontWeight="SemiBold"
+                                Foreground="White" />
+                            <Button
+                                Name="btnScript"
+                                Grid.Column="2"
+                                Width="130"
+                                Height="35"
+                                Background="Transparent"
+                                BorderBrush="White"
+                                Click="ScriptObject_Click"
+                                Content="📋 Script"
+                                Foreground="White"
+                                Style="{StaticResource SecondaryButton}" />
+                            <Button
+                                Name="btnNewScript"
+                                Grid.Column="3"
+                                Width="130"
+                                Height="35"
+                                Margin="8,0,0,0"
+                                Background="Transparent"
+                                BorderBrush="White"
+                                Click="NewScript_Click"
+                                Content="📝 Nuovo Script"
+                                Foreground="White"
+                                Style="{StaticResource SecondaryButton}" />
+                        </Grid>
+                    </Border>
+
+                    <!--  DataGrid  -->
+                    <DataGrid
+                        Name="dgObjects"
+                        Grid.Row="1"
+                        Margin="1"
+                        AutoGenerateColumns="False"
+                        Background="{StaticResource SurfaceBrush}"
+                        BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="0"
+                        CanUserAddRows="False"
+                        CanUserDeleteRows="False"
+                        CanUserReorderColumns="False"
+                        CanUserResizeRows="False"
+                        CanUserSortColumns="True"
+                        GridLinesVisibility="Horizontal"
+                        IsReadOnly="True"
+                        MouseDoubleClick="DgObjects_MouseDoubleClick"
+                        RowHeaderWidth="0"
+                        SelectionMode="Extended">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn
+                                Width="*"
+                                MinWidth="250"
+                                Binding="{Binding Name}"
+                                Header="📄 Nome">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Padding" Value="8,4" />
+                                        <Setter Property="FontWeight" Value="Medium" />
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn
+                                Width="140"
+                                Binding="{Binding Type}"
+                                Header="🏷️ Tipo">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Padding" Value="8,4" />
+                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                        <Style.Triggers>
+                                            <Trigger Property="Text" Value="Stored Procedure">
+                                                <Setter Property="Foreground" Value="{StaticResource StoredProcBrush}" />
+                                            </Trigger>
+                                            <Trigger Property="Text" Value="View">
+                                                <Setter Property="Foreground" Value="{StaticResource ViewBrush}" />
+                                            </Trigger>
+                                            <DataTrigger Binding="{Binding Type}" Value="Scalar Function">
+                                                <Setter Property="Foreground" Value="{StaticResource FunctionBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Type}" Value="Inline Table Function">
+                                                <Setter Property="Foreground" Value="{StaticResource FunctionBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Type}" Value="Table Function">
+                                                <Setter Property="Foreground" Value="{StaticResource FunctionBrush}" />
+                                            </DataTrigger>
+                                            <Trigger Property="Text" Value="Trigger">
+                                                <Setter Property="Foreground" Value="{StaticResource TriggerBrush}" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn
+                                Width="100"
+                                Binding="{Binding Schema}"
+                                Header="🗂️ Schema">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Padding" Value="8,4" />
+                                        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn
+                                Width="160"
+                                Binding="{Binding ModifyDate, StringFormat=dd/MM/yyyy HH:mm}"
+                                Header="📅 Data Modifica">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Padding" Value="8,4" />
+                                        <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}" />
+                                        <Setter Property="FontSize" Value="12" />
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!--  Status Bar  -->
+        <StatusBar Grid.Row="2" Height="32">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+
+            <StatusBarItem Grid.Column="0">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock
+                        Name="txtStatus"
+                        Margin="8,0"
+                        Text="Pronto" />
+                    <ProgressBar
+                        Name="progressBar"
+                        Width="200"
+                        Height="16"
+                        Margin="12,0,0,0"
+                        Background="{StaticResource BorderBrush}"
+                        BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="1"
+                        Foreground="{StaticResource SuccessBrush}"
+                        Visibility="Collapsed" />
+                </StackPanel>
+            </StatusBarItem>
+
+            <StatusBarItem Grid.Column="1">
+                <Border
+                    Padding="8,2"
+                    Background="{StaticResource SecondaryBrush}"
+                    CornerRadius="8">
+                    <TextBlock
+                        Name="txtFilterStatus"
+                        FontSize="11"
+                        FontWeight="SemiBold"
+                        Foreground="White" />
+                </Border>
+            </StatusBarItem>
+
+            <StatusBarItem Grid.Column="2">
+                <TextBlock
+                    Margin="12,0,8,0"
+                    FontSize="11"
+                    Foreground="{StaticResource TextMutedBrush}"
+                    Text="Sigma SQL Management Studio v1.0" />
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>
