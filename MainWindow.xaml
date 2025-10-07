@@ -2,7 +2,7 @@
     x:Class="SigmaMS.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="SQL Server Manager"
+    Title="Sigma Management Studio"
     Width="1200"
     Height="800"
     Background="{StaticResource BackgroundBrush}"
@@ -152,6 +152,7 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
                         <Label
@@ -161,8 +162,8 @@
                         <TextBox
                             Name="txtFilter1"
                             Grid.Column="1"
-                            Margin="8,0,16,0"
-                            Padding="10,8"
+                            Margin="8,0,12,0"
+                            Padding="8,8"
                             TextChanged="Filter_TextChanged"
                             ToolTip="Es: Giant3% - Filtra oggetti che iniziano con 'Giant3'" />
 
@@ -173,8 +174,8 @@
                         <TextBox
                             Name="txtFilter2"
                             Grid.Column="3"
-                            Margin="8,0,16,0"
-                            Padding="10,8"
+                            Margin="8,0,12,0"
+                            Padding="8,8"
                             TextChanged="Filter_TextChanged"
                             ToolTip="Es: PO_caricoImpianti - Filtra ulteriormente i risultati" />
 
@@ -185,14 +186,25 @@
                         <TextBox
                             Name="txtFilter3"
                             Grid.Column="5"
-                            Margin="8,0,16,0"
-                            Padding="10,8"
+                            Margin="8,0,12,0"
+                            Padding="8,8"
                             TextChanged="Filter_TextChanged"
                             ToolTip="Filtro finale per affinare la ricerca" />
 
                         <Button
-                            Name="btnClearFilters"
+                            Name="btnSearchInScript"
                             Grid.Column="6"
+                            Width="120"
+                            Height="35"
+                            Margin="0,0,8,0"
+                            Click="SearchInScript_Click"
+                            Content="🔍 Cerca in Script"
+                            ToolTip="Cerca il testo inserito nei filtri all'interno del codice degli oggetti (Stored Procedures, Functions, Views, Triggers)"
+                            Style="{StaticResource SecondaryButton}" />
+
+                        <Button
+                            Name="btnClearFilters"
+                            Grid.Column="7"
                             Width="100"
                             Height="35"
                             Click="ClearFilters_Click"

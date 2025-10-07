@@ -527,6 +527,76 @@ namespace SigmaMS {
             await SaveCurrentFiltersAsync();
         }
 
+        private async void SearchInScript_Click(object sender, RoutedEventArgs e) {
+            if (cmbConnections.SelectedItem is not DatabaseConnection connection ||
+                string.IsNullOrEmpty(_currentDatabase)) {
+                MessageBox.Show("Seleziona prima una connessione e un database.", "Attenzione",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // Raccoglie tutti i testi di ricerca non vuoti
+            var searchTexts = new List<string>();
+            if (!string.IsNullOrWhiteSpace(txtFilter1.Text)) searchTexts.Add(txtFilter1.Text.Trim().TrimEnd('%'));
+            if (!string.IsNullOrWhiteSpace(txtFilter2.Text)) searchTexts.Add(txtFilter2.Text.Trim().TrimEnd('%'));
+            if (!string.IsNullOrWhiteSpace(txtFilter3.Text)) searchTexts.Add(txtFilter3.Text.Trim().TrimEnd('%'));
+
+            if (searchTexts.Count == 0) {
+                MessageBox.Show("Inserisci almeno un testo di ricerca in uno dei filtri.", "Attenzione",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            try {
+                UpdateStatus("🔍 Ricerca nel testo degli script in corso...");
+                Mouse.OverrideCursor = Cursors.Wait;
+                btnSearchInScript.IsEnabled = false;
+
+                var dbConnection = new DatabaseConnection {
+                    Name = connection.Name,
+                    Server = connection.Server,
+                    Database = _currentDatabase,
+                    IntegratedSecurity = connection.IntegratedSecurity,
+                    Username = connection.Username,
+                    Password = connection.Password
+                };
+
+                // Esegui la ricerca per ogni termine e unisci i risultati
+                var foundObjects = new List<DatabaseObject>();
+                foreach (var searchText in searchTexts) {
+                    var results = await _dataService.SearchInScriptTextAsync(dbConnection.ConnectionString, searchText);
+                    foundObjects.AddRange(results);
+                }
+
+                // Rimuovi duplicati
+                foundObjects = foundObjects.GroupBy(o => new { o.Schema, o.Name, o.Type })
+                                          .Select(g => g.First())
+                                          .ToList();
+
+                if (foundObjects.Count == 0) {
+                    MessageBox.Show($"Nessun oggetto trovato contenente il testo cercato.", "Risultato Ricerca",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                    UpdateStatus("❌ Nessun risultato");
+                } else {
+                    // Sostituisci completamente la lista filtrata con i risultati della ricerca
+                    _filteredObjects = foundObjects;
+                    UpdateObjectTypeTree();
+                    UpdateStatus($"✅ Trovati {foundObjects.Count} oggetti");
+                }
+            } catch (Exception ex) {
+                MessageBox.Show($"Errore durante la ricerca nel testo: {ex.Message}", "Errore",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                UpdateStatus("❌ Errore nella ricerca");
+            } finally {
+                Mouse.OverrideCursor = null;
+                btnSearchInScript.IsEnabled = true;
+
+                // Ripristina status dopo 3 secondi
+                _ = Task.Delay(3000).ContinueWith(_ =>
+                    Dispatcher.BeginInvoke(() => UpdateStatus("Pronto")));
+            }
+        }
+
         private void UpdateFilterStatus() {
             var activeFilters = new List<string>();
 

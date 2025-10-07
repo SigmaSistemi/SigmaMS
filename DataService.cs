@@ -669,7 +669,7 @@ namespace SigmaMS.Services {
                 await connection.OpenAsync();
 
                 var query = @"
-            SELECT 
+            SELECT
                 s.name as schema_name,
                 syn.name as synonym_name
             FROM sys.synonyms syn
@@ -689,6 +689,57 @@ namespace SigmaMS.Services {
                 }
             } catch (Exception ex) {
                 throw new Exception($"Errore nel recupero dei sinonimi: {ex.Message}", ex);
+            }
+
+            return objects;
+        }
+
+        public async Task<List<DatabaseObject>> SearchInScriptTextAsync(string connectionString, string searchText) {
+            var objects = new List<DatabaseObject>();
+
+            if (string.IsNullOrWhiteSpace(searchText)) {
+                return objects;
+            }
+
+            try {
+                using var connection = new SqlConnection(connectionString);
+                await connection.OpenAsync();
+
+                var query = @"
+                    SELECT DISTINCT
+                        SCHEMA_NAME(obj.schema_id) AS schema_name,
+                        obj.name AS object_name,
+                        obj.modify_date,
+                        CASE
+                            WHEN obj.type = 'P' THEN 'Stored Procedure'
+                            WHEN obj.type = 'FN' THEN 'Scalar Function'
+                            WHEN obj.type = 'IF' THEN 'Inline Table Function'
+                            WHEN obj.type = 'TF' THEN 'Table Function'
+                            WHEN obj.type = 'TR' THEN 'Trigger'
+                            WHEN obj.type = 'V' THEN 'View'
+                        END AS object_type
+                    FROM sys.sql_modules AS mod
+                    INNER JOIN sys.objects AS obj ON mod.object_id = obj.object_id
+                    WHERE obj.type IN ('P', 'FN', 'IF', 'TF', 'TR', 'V')
+                    AND LOWER(mod.definition) LIKE '%' + LTRIM(RTRIM(LOWER(@searchText))) + '%'
+                    AND obj.is_ms_shipped = 0
+                    ORDER BY SCHEMA_NAME(obj.schema_id), obj.name";
+
+                using var command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@searchText", searchText);
+
+                using var reader = await command.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync()) {
+                    objects.Add(new DatabaseObject {
+                        Name = reader.GetString("object_name"),
+                        Schema = reader.GetString("schema_name"),
+                        Type = reader.GetString("object_type"),
+                        ModifyDate = reader.IsDBNull("modify_date") ? null : reader.GetDateTime("modify_date")
+                    });
+                }
+            } catch (Exception ex) {
+                throw new Exception($"Errore nella ricerca nel testo degli script: {ex.Message}", ex);
             }
 
             return objects;
