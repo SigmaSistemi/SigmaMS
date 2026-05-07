@@ -193,7 +193,8 @@ namespace SigmaMS {
 
                     // Se abbiamo trovato la dichiarazione, processa i parametri
                     if (foundProcedureDeclaration && !parametersProcessed) {
-                        if (upperLine == "AS" || (upperLine.StartsWith("AS ") && !upperLine.StartsWith("@"))) {
+                        if (!upperLine.StartsWith("@") &&
+                            (upperLine == "AS" || upperLine.EndsWith(") AS") || upperLine.StartsWith("AS ") || upperLine.StartsWith("AS\t"))) {
                             if (currentParameterBuilder.Length > 0) {
                                 var param = ExtractParameter(currentParameterBuilder.ToString());
                                 if (!string.IsNullOrEmpty(param)) {
